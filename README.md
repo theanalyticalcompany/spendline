@@ -1,61 +1,107 @@
 # Spendline local MVP
 
-Lokalni prototyp webove aplikace pro rizeni provoznich osobnich financi podle vyplatniho cyklu.
+Lokální prototyp webové aplikace pro řízení provozních osobních financí podle výplatního cyklu.
 
-## Spusteni
+## Spuštění
 
-Aplikace pouziva Node.js a vestaveny HTTP server. Z korene projektu:
-
-```powershell
-node app\server.js
-```
-
-V tomto Codex prostredi lze pouzit bundled Node runtime:
+V tomto Codex prostředí použij bundled Node runtime:
 
 ```powershell
 & "C:\Users\ivan\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" app\server.js
 ```
 
-Aplikace bezi na:
+Aplikace poběží na:
 
 ```text
 http://127.0.0.1:4173
 ```
 
-Nespoustej ji pres `cmd /c start`. Pro lokalni test ji spust interaktivne v terminalu a po testu ukonci `Ctrl+C`.
+Nespouštěj ji přes `cmd /c start`. Pokud ji chceš testovat, spusť ji interaktivně v terminálu a po testu ji ukonči `Ctrl+C`.
 
-## Prvni pruchod
+## První průchod
 
-1. Zaregistruj prvni ucet. Prvni registrovany uzivatel dostane roli admin.
-2. V Nastaveni nastav pevnou mesicni castku a pridej vlastni ucty.
+1. Zaregistruj první účet. První registrovaný uživatel dostane roli admin.
+2. V Nastavení nastav pevnou měsíční částku a přidej vlastní účty.
 3. V Importu nahraj `outputs/demo-transakce.csv`.
-4. Zkontroluj mapovani sloupcu a potvrd import.
-5. V Transakcich oznac prichozi vyplatu jako mzdu.
-6. V Pravidelnych platbach potvrd navrzene pravidelne platby.
-7. V Dashboardu uvidis denni spend, dovoleny denni spend, budgety a predikci.
+4. Zkontroluj mapování sloupců a potvrď import.
+5. V Transakcích označ příchozí výplatu jako mzdu.
+6. V Pravidelných platbách potvrď navržené pravidelné platby.
+7. V Dashboardu uvidíš denní spend, dovolený denní spend a predikci.
 
-## Bezpecnost
+## Aktuální lokální demo data
 
-Do repozitare nepatri lokalni data, bankovni exporty, databaze ani sifrovaci klice. Lokalni adresar `work/` je ignorovany a neni soucasti publikovaneho zdrojoveho kodu.
+Po smoke testu je připravený demo uživatel:
+
+```text
+demo@local.test
+demo1234
+```
+
+Admin účet vytvořený při prvním testovacím průchodu:
+
+```text
+test-253318656@local.test
+test1234
+```
+
+## Smoke test
+
+Když server běží, lze ověřit základní flow příkazem:
+
+```powershell
+& "C:\Users\ivan\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" app\smoke-test.js
+```
+
+Ověření, že více historických výplat zůstane uložených jako `Mzda`:
+
+```powershell
+& "C:\Users\ivan\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" app\salary-persistence-test.js
+```
+
+Ověření filtrů transakcí podle částky a data:
+
+```powershell
+& "C:\Users\ivan\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" app\filter-range-test.js
+```
+
+Ověření vytvoření trvalé platby z odchozí transakce a dohledání historie:
+
+```powershell
+& "C:\Users\ivan\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" app\regular-from-transaction-test.js
+```
+
+Ověření budget režimu, obálek, plánovaného výdaje a přiřazení transakce k budgetu:
+
+```powershell
+& "C:\Users\ivan\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" app\budget-mode-test.js
+```
+
+Plná regrese hlavních MVP scénářů:
+
+```powershell
+& "C:\Users\ivan\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe" app\full-regression-test.js
+```
 
 ## CSV encoding
 
-Import rozlisuje UTF-8, UTF-8 s BOM a Windows-1250. Bankovni exporty s ceskou diakritikou se maji zobrazit bez rozbite znakove sady.
+Import automaticky rozlišuje UTF-8, UTF-8 s BOM a Windows-1250. Reálné bankovní exporty s českou diakritikou, například hlavičkami typu `#Účet` a `#Částka`, se mají zobrazit bez rozbité znakové sady.
 
-## Testy
+## Lokální data
 
-Kdyz server bezi, lze spoustet cilene testy z adresare projektu:
+Data se ukládají do:
 
-```powershell
-node app\smoke-test.js
-node app\salary-persistence-test.js
-node app\filter-range-test.js
-node app\regular-from-transaction-test.js
-node app\budget-mode-test.js
+```text
+work/local-app-data/db.json
 ```
 
-Plna regrese je dostupna, ale nepousti se pri kazde male iteraci:
+Citlivá pole transakcí jsou v lokálním úložišti šifrovaná. Šifrovací klíč je v:
 
-```powershell
-node app\full-regression-test.js
+```text
+work/local-app-data/secret.key
+```
+
+Lokální reset hesla a systémové e-maily se zapisují do:
+
+```text
+work/local-app-data/mailbox.log
 ```
