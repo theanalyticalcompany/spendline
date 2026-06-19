@@ -1,0 +1,11 @@
+work/
+*.log
+*.key
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.*
+node_modules/
+*.csv
+!outputs/demo-transakce.csv
